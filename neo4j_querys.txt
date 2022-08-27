@@ -1,0 +1,14 @@
+8,4,6 e 10
+NEO4J
+1 -> MATCH(employee:EMPLOYEE) RETURN employee ORDER BY employee.salary
+2 -> MATCH(employee:EMPLOYEE) RETURN employee.department_id, count(*)
+3 -> MATCH(department:DEPARTMENT) WHERE department.id = "50" RETURN department
+4 -> MATCH(employee:EMPLOYEE)-[:WORKS_IN]->(department:DEPARTMENT) RETURN department.department_name, count(employee.id) ORDER BY count(employee.id) DESC LIMIT 1
+5 -> 
+6 ->
+7 ->
+8 ->
+9 ->
+10->
+11->
+12->

@@ -1,0 +1,18 @@
+1 -> db.EMPLOYEES.find({}).sort({SALARY: 1}).pretty()
+2 -> db.EMPLOYEES.aggregate({$unwind: "$DEPARTMENTS.DEPARTMENT_ID"}, {$group: {"_id": "$DEPARTMENTS.DEPARTMENT_ID", "COUNT": {$sum:1}}}) 
+3 -> db.DEPARTMENTS.find({DEPARTMENT_ID: 50}).pretty()
+4 -> db.EMPLOYEES.aggregate({$unwind: "$EMPLOYEE_ID"}, 
+	{$group: {"_id": "$DEPARTMENTS.DEPARTMENT_NAME", "COUNT": {$sum:1}}}, {$sort: {"COUNT": -1}}, {$limit: 1})
+5 -> db.EMPLOYEES.aggregate({$unwind: "$JOBS.JOB_ID"}, 
+	{$group: {"_id": {$concat:["$FIRST_NAME", " ","$LAST_NAME"]}, "COUNT": {$sum:1}}}, {$sort: {"COUNT": 1}})
+6 -> db.JOB_HISTORY.aggregate({$unwind: "$EMPLOYEES.DEPARTMENT_ID"}, 
+	{$group: {"_id": "$EMPLOYEES.EMPLOYEE_ID", "COUNT": {$sum:1}}},{$match: {"COUNT": {"$gt": 1}}})
+7 -> db.EMPLOYEES.aggregate({$unwind: "$JOB_HISTORY.DEPARTMENT_ID"}, 
+	{$group: {"_id": "$EMPLOYEE_ID", "COUNT": {$sum:1}, "DATA": {"$addToSet": "$$ROOT"}}},{$match: {"COUNT": {"$gt": 1}}})
+8 -> db.EMPLOYEES.find({}).sort({SALARY: -1}).limit(1).pretty()
+9 -> db.DEPARTMENTS.find({"LOCATIONS.CITY": "Seattle"}).pretty()
+10-> db.DEPARTMENTS.find({"REGIONS.REGION_NAME": "Europe"},{_id: 0, DEPARTMENT_NAME: 1}).pretty()
+11-> db.EMPLOYEES.find({MANAGER_ID: 100}).limit(1).pretty()
+12-> db.EMPLOYEES.find({$and:[{MANAGER_ID: 100}, {"DEPARTMENTS.DEPARTMENT_ID": 90}]}).pretty()
+13-> ?
+

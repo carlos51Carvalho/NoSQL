@@ -1,0 +1,127 @@
+//employees
+LOAD CSV FROM 'file:///emp.csv' AS line
+CREATE (employee:EMPLOYEE {id: line[0], first_name: line[1], last_name: line[2], email: line[3], phone_number: line[4], hire_date: line[5], job_id: line[6], salary: line[7], comission_pct: line[8], manager_id: line[9], department_id: line[10]})
+Return employee
+
+
+//departments 
+LOAD CSV FROM 'file:///departments.csv' AS line
+CREATE (department:DEPARTMENT {id: line[0], department_name: line[1], manager_id: line[2], location_id: line[3]})
+Return department
+
+
+//jobs
+LOAD CSV FROM 'file:///jobs.csv' AS line
+CREATE (job:JOB {id: line[0], job_title: line[1], min_salary: line[2], max_salary: line[3]})
+Return job
+
+//LOCATIONS
+LOAD CSV FROM 'file:///locations.csv' AS line
+CREATE (location:LOCATION {id: line[0], street_address: line[1], postal_code: line[2], city: line[3], state_providence: line[4], country_id: line[5] })
+Return location
+
+//COUNTRIES
+
+LOAD CSV FROM 'file:///countries.csv' AS line
+CREATE (country:COUNTRY {id: line[0], country_name: line[1], region_id: line[2]})
+Return country
+
+//REGION
+LOAD CSV FROM 'file:///regions.csv' AS line
+CREATE (region:REGION {id: line[0],region_name: line[1]})
+Return region
+
+
+//JOB_HISTORY
+LOAD CSV FROM 'file:///job_history.csv' AS line
+CREATE (job_history:JOB_HISTORY {employee_id: line[0],start_date: line[1], end_date: line[2],job_id: line[3], department_id: line[4] })
+Return job_history
+
+
+//employees with departments 
+
+MATCH
+  (employee:EMPLOYEE {id: employee.id}),
+  (department:DEPARTMENT {id: employee.department_id})
+CREATE (employee)-[:WORKS_IN]->(department)
+return employee, department;
+
+//employees with managers
+MATCH
+  (employee:EMPLOYEE {id: employee.id}),
+  (manager:EMPLOYEE {id: employee.manager_id})
+CREATE (employee)-[:REPORTA]->(manager)
+
+//employees with jobs
+MATCH
+  (employee:EMPLOYEE {id: employee.id}),
+  (job:JOB {id: employee.job_id})
+CREATE (employee)-[:FAZ_TRABALHo]->(job)
+return employee, job;
+
+//country region
+
+MATCH
+  (country:COUNTRY {id: country.id}),
+  (region:REGION {id: country.region_id})
+CREATE (country)-[:SITUA_EM]->(region)
+return country, region;
+
+//location couuntry
+
+MATCH
+  (location:LOCATION {id: location.id}),
+  (country:COUNTRY {id: location.country_id})
+CREATE (location)-[:EM]->(country)
+return location, country;
+
+
+//department location
+
+MATCH
+  (department:DEPARTMENT {id: department.id}),
+  (location:LOCATION {id: department.location_id})
+CREATE (department)-[:ALOJADO_EM]->(location)
+return department, location;
+
+
+// department manager
+MATCH
+  (department:DEPARTMENT {id: department.id}),
+  (manager:EMPLOYEE {id: department.manager_id})
+CREATE (department)-[:MANAGED_BY]->(manager)
+return department, manager;
+
+//job history employee
+MATCH
+  (employee:EMPLOYEE {id: employee.id}),
+  (job_history:JOB_HISTORY {employee_id: employee.id})
+CREATE (employee)-[:TRABALHOU]->(job_history)
+return employee, job_history;
+
+
+
+//job_history with department
+
+MATCH
+  (employee:EMPLOYEE {id: employee.id}),
+  (job_history:JOB_HISTORY {employee_id: employee.id})
+MATCH 
+  (job_history: JOB_HISTORY {employee_id: job_history.employee_id}), 
+  (department: DEPARTMENT {id: job_history.department_id})
+
+CREATE (job_history)-[:TRABLHOU_EM]->(department) 
+  RETURN employee,job_history, department 
+
+
+//job_history with jobs
+
+MATCH
+  (employee:EMPLOYEE {id: employee.id}),
+  (job_history:JOB_HISTORY {employee_id: employee.id})
+MATCH 
+  (job_history: JOB_HISTORY {employee_id: job_history.employee_id}), 
+  (job: JOB {id: job_history.job_id})
+
+CREATE (job_history)-[:TRABLHOU_EM]->(job) 
+  RETURN employee,job_history, job 
